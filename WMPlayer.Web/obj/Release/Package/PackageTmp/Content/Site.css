@@ -1,0 +1,269 @@
+﻿body
+{
+    font-size: .85em;
+    font-family: "Trebuchet MS", Verdana, Helvetica, Sans-Serif;
+    color: #232323;
+    background-color: #fff;
+    padding: 0;
+    margin: 0;
+}
+
+header,
+footer,
+nav,
+section {
+    display: block;
+}
+a {
+    cursor: pointer;
+    text-decoration: underline;
+}
+ul {
+    list-style-type: none;
+}
+
+/* Styles for basic forms
+-----------------------------------------------------------*/
+
+fieldset 
+{
+    border:1px solid #ddd;
+    /*padding:0 1.4em 1.4em 1.4em;
+    margin:0 0 1.5em 0;*/
+    padding: 20px
+}
+
+legend 
+{
+    font-size:1.2em;
+    font-weight: bold;
+}
+
+textarea 
+{
+    min-height: 75px;
+}
+
+.editor-label 
+{
+    margin: 1em 0 0 0;
+}
+
+.editor-field 
+{
+    margin:0.5em 0 0 0;
+}
+
+table {
+    width: 100%
+}
+
+th {
+    text-align: left;
+}
+
+
+/* Styles for validation helpers
+-----------------------------------------------------------*/
+.field-validation-error
+{
+    color: #ff0000;
+}
+
+.field-validation-valid
+{
+    display: none;
+}
+
+.input-validation-error
+{
+    border: 1px solid #ff0000;
+    background-color: #ffeeee;
+}
+
+.validation-summary-errors
+{
+    font-weight: bold;
+    color: #ff0000;
+}
+
+.validation-summary-valid
+{
+    display: none;
+}
+
+/* Kendo Tweeks
+-----------------------------------------------------------*/
+
+.k-grid-pager {
+    display: table;
+    width: 100%;
+}
+.k-pager {
+    float: right;
+}
+.k-pager-numbers, .k-pager-numbers.k-reset > li{
+    float: left;
+}
+.k-pager-numbers .k-state-selected{
+    padding:0 4px;
+    background-color:#F1FFFF;
+    border: solid 1px #D7D7D7;
+}
+
+/* Player 
+-----------------------------------------------------------*/
+#Player > div{
+    margin-bottom: 20px;
+}
+/*
+.ui-slider {
+    border-radius: 4px;
+    background: url("images/ui-bg_flat_75_ffffff_40x100.png") repeat-x scroll 50% 50% #FFFFFF;
+    border: 1px solid #AAAAAA;
+    color: #222222;
+    height: 0.8em;
+    position: relative;
+    text-align: left;
+}
+.ui-slider > a {
+    border-radius: 4px;
+    background: url("images/ui-bg_glass_75_e6e6e6_1x400.png") repeat-x scroll 50% 50% #E6E6E6;
+    border: 1px solid #D3D3D3;
+    color: #555555;
+    font-weight: normal;
+    margin-left: -1px;
+    top: -0.3em;
+    cursor: default;
+    height: 1.2em;
+    position: absolute;
+    width: 1.2em;
+    z-index: 2;
+}*/
+
+
+.ui-slider {
+  position: relative;
+  text-align: left;
+}
+
+.ui-state-default, .ui-widget-content .ui-state-default, .ui-widget-header .ui-state-default {
+  background: url("images/ui-bg_glass_75_e6e6e6_1x400.png") repeat-x scroll 50% 50% #E6E6E6;
+  border: 1px solid #D3D3D3;
+  color: #555555;
+  font-weight: normal;
+}
+
+.ui-corner-all {
+    border-radius: 4px;
+}
+
+.ui-widget-content {
+  background: url("images/ui-bg_flat_75_ffffff_40x100.png") repeat-x scroll 50% 50% #FFFFFF;
+  border: 1px solid #AAAAAA;
+  color: #222222;
+}
+
+.ui-slider .ui-slider-handle {
+  /*cursor: default;*/
+  cursor: url("images/openhand.cur"), default;
+  height: 1.2em;
+  position: absolute;
+  width: 1.2em;
+  z-index: 2;
+}
+
+.ui-slider-horizontal .ui-slider-handle {
+    margin-left: -0.6em;
+    top: -0.3em;
+}
+
+.ui-slider-horizontal {
+    height: 0.8em;
+}
+
+#Volume {
+    display: block;
+    float: left;
+    height: 43px;
+    margin: 0 20px 0 0;
+}
+
+.ui-slider-vertical {
+    width: 0.8em;
+}
+
+.ui-slider-vertical .ui-slider-handle {
+  left: -0.3em;
+  margin-bottom: -0.6em;
+  margin-left: 0;
+}
+
+/*#LibraryDetail {
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+}*/
+
+.p-button span{
+    background-image: url("/content/images/player-sprite2.png");
+    background-color: transparent;
+    background-repeat: no-repeat;
+    display: inline-block;
+    font-size: 0;
+    line-height: 0;
+    overflow: hidden;
+    text-align: center;
+    text-indent: -3333px;
+}
+
+
+.pb-stop {
+    background-position: -117px -134px;
+    height: 45px;
+    width: 45px;
+    margin: 0px;
+}
+
+
+.pb-pause ,
+.pb-play ,
+.pb-fastforward ,
+.pb-skip 
+{
+
+    margin-left: 20px;
+}
+.pb-pause {
+    background-position: -177px -134px;
+    height: 45px;
+    width: 38px
+}
+.pb-play {
+    background-position: -75px -134px;
+    height: 45px;
+    width: 38px
+}
+.pb-fastforward {
+    background-position: -238px -78px;
+    height: 45px;
+    width: 59px;
+}
+.pb-skip {
+    background-position: -237px -134px;
+    height: 45px;
+    width: 55px;
+}
+.p-button .disabled {
+    opacity: .3;
+    filter: alpha(opacity=30);    
+}
+
+.p-button .disabled {
+  opacity: 0.3;
+}
+
+#LibraryGrid td {
+    white-space: nowrap;
+}
