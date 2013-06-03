@@ -7,9 +7,10 @@ Build machine requirements:
 - .Net 4.5
 - Visual Studio 2012
 
-Server requiremnets: 
+Server requiremnets (known): 
 - .Net 4.0
-- IIS7
+- IIS 7
+- Windows Media Player
 
 IIS Config:
 - Configure App Pool identity to have credentials to mp3 files root dir
