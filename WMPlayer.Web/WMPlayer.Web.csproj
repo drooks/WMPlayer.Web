@@ -272,7 +272,6 @@
     <Content Include="Views\StandAlone\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="App_Data\" />
     <Folder Include="Data\" />
     <Folder Include="Utilities\" />
   </ItemGroup>
