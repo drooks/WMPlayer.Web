@@ -37,4 +37,3 @@ C:\Users\drooks\Desktop\Winamp JBX\WMPlayer.Web\bin\System.Web.WebPages.Deployme
 C:\Users\drooks\Desktop\Winamp JBX\WMPlayer.Web\bin\System.Web.WebPages.Razor.xml
 C:\Users\drooks\Desktop\Winamp JBX\WMPlayer.Web\obj\Debug\WMPlayer.Web.dll
 C:\Users\drooks\Desktop\Winamp JBX\WMPlayer.Web\obj\Debug\WMPlayer.Web.pdb
-C:\Users\drooks\Desktop\Winamp JBX\WMPlayer.Web\obj\Debug\WMPlayer.Web.csprojResolveAssemblyReference.cache

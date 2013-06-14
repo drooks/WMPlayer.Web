@@ -267,3 +267,31 @@ th {
 #LibraryGrid td {
     white-space: nowrap;
 }
+
+#LibraryGrid table
+{
+    table-layout: fixed;
+}
+
+#LibraryGrid .k-grid-content
+{
+    overflow: scroll;
+}
+
+    #LibraryGrid .k-grid-content table td
+    {
+        overflow: hidden;
+    }
+
+#PlaylistGrid tbody tr:first-child .moveup, #PlaylistGrid tbody tr:last-child .movedown
+{
+    display: none;
+}
+
+.doubleStack .k-link
+{
+    height: 12px;
+    margin: 0;
+    padding: 0;
+    clear: both;
+}

@@ -1,0 +1,416 @@
+﻿@{
+    ViewBag.Title = "Musiq Server 1000 - StandAlone Player";
+}
+
+@section Scripts {
+    <script type="text/javascript">
+        // Global Vars
+        var playlist = [];
+        var audioPreview = null;
+        var currentSongId = null;
+        state = {
+            stopped: 0,
+            playing: 1,
+            paused: 2
+        }
+        var playerState = state.stopped;
+
+        // protos
+
+        String.format = function () {
+            var s = arguments[0];
+            for (var i = 0; i < arguments.length - 1; i++) {
+                var reg = new RegExp("\\{" + i + "\\}", "gm");
+                s = s.replace(reg, arguments[i + 1]);
+            }
+            return s;
+        };
+
+        Array.prototype.move = function (from, to) {
+            this.splice(to, 0, this.splice(from, 1)[0]);
+        };
+
+        Array.prototype.randomize = function () {
+            var i = this.length, j, temp;
+            if (i === 0) return false;
+            while (--i) {
+                j = Math.floor(Math.random() * (i)) + 1;
+                temp = this[i];
+                this[i] = this[j];
+                this[j] = temp;
+            }
+        }
+
+        function GetSeconds(ms) {
+            ms = ms + '';
+            var a = ms.split(':'); // split it at the colons
+            return (+a[0]) * 60 + (+a[1]);
+        }
+
+        $(window).resize(function () {
+            resize();
+        });
+
+        function resize() {
+            $("#LibraryDetail>div").height($(window).outerHeight() - $("#LibraryDetail>div").position().top - 20);
+            $("#LibraryGrid .k-grid-content").height($(window).outerHeight() - $("#LibraryGrid .k-grid-content").position().top - 20);
+
+            $("#PlaylistGrid").height($(window).outerHeight() - $("#PlaylistGrid").position().top - 20);
+
+            var w = ($(window).outerWidth() / 2) - 32; // 20 and 10px margins and 2 for borders
+            $("#LibraryGrid").width(w);
+            $("#PlaylistGrid").width(w);
+        }
+
+        $(document).ready(function () {
+            // instantiate player
+            var audioPlayer = document.createElement('audio');
+            audioPlayer.addEventListener("ended", function () {
+                playlist.splice(0, 1);
+                bindPlaylist();
+                playerState = state.stopped;
+                $("#btnPlay").click();
+            }, true);
+            audioPlayer.addEventListener("timeupdate", function () {
+                $("#Timeline").slider('value', audioPlayer.currentTime);
+            }, true);
+
+            
+
+            $.get("@Url.Action("GetLibrary")", null, function (result) {
+                bindLibrary(result);
+            });
+
+            //// Bind Volume control slider
+            $("#Volume").slider({
+                orientation: "vertical",
+                min: 0,
+                max: 10,
+                value: 10,
+                slide: function (event, ui) {
+                    audioPlayer.volume = ui.value / 10;
+                }
+            });
+
+            $("#Timeline").slider({
+                min: 0,
+                max: 1,
+                value: 0
+            });
+
+            $("#btnStop").click(function () {
+                audioPlayer.pause();
+                audioPlayer.currentTime = 0;
+                playerState = state.stopped;
+                bindPlayer();
+            });
+
+            $("#btnPlay, #btnPause").click(function () {
+                if(playlist[0] && playerState == state.stopped){
+                    audioPlayer.setAttribute('src', "@Url.Action("GetSong")/" + playlist[0].SongId);
+                    audioPlayer.play();
+                    playerState = state.playing
+                }else if(playerState == state.playing){
+                    audioPlayer.pause();
+                    playerState = state.paused;
+                }
+                else if (playerState == state.paused) {
+                    audioPlayer.play();
+                    playerState = state.playing
+                }
+                bindPlayer();
+            });
+
+            $("#btnSkip").click(function () {
+                playlist.splice(0, 1);
+                bindPlaylist();
+                if (playerState == state.playing) {
+                    playerState = state.stopped;
+                    $("#btnPlay").click();
+                }
+                bindPlayer();
+            });
+
+            $("#lnkRefreshLibrary").click(function () {
+                $.get("@Url.Action("GetLibrary")", null, function (result) {
+                    bindLibrary(result);
+                });
+            });
+
+            $(".queueSong").live("click", function () {
+                $.get("@Url.Action("GetSongInfo")/" + $(this).attr("songId"), null, function (result) {
+                    playlist.push(result);
+                }).complete(function () {
+                    bindPlaylist();
+                    bindPlayer();
+                });
+            });
+
+            $(".unqueueSong").live("click", function () {
+                playlist.splice($(this).attr("PlaylistIndex"), 1);
+                bindPlaylist();
+            });
+
+            $("#lnkClearPlaylist").click(function () {
+                if (confirm("Clear all songs. Are you sure?")) {
+                    playlist = [];
+                    bindPlaylist();
+                    bindPlayer();
+                }
+            });
+
+            $(".moveup").live("click", function () {
+                var i = $(this).attr("PlaylistIndex");
+                playlist.move(i, i - 1);
+                bindPlaylist();
+            });
+            $(".movedown").live("click", function () {
+                var i = $(this).attr("PlaylistIndex") * 1;
+                playlist.move(i, i + 1);
+                bindPlaylist();
+            });
+
+            $("#lnkRandom10").click(function () {
+                var rows = $("#LibraryGrid tbody tr").length;
+                if (rows > 10) {
+                    var picks = [];
+                    for (var i = 0; i < 10;) {
+                        var number = Math.floor(Math.random() * rows);
+
+                        if ($.inArray(number, picks) == -1) {
+                            $("#LibraryGrid tbody tr td:first-child a")[number].click();
+                            picks.push(number);
+                            i += 1;
+                        }
+                    }
+                }
+            });
+
+            $("#lnkShufflePlaylist").click(function () {
+                playlist.randomize();
+                bindPlaylist();
+            });
+
+            /* Links *******************************************/
+            $(".songDownload").live('click', function () {
+                window.location = "@Url.Action("GetSong")/" + $(this).attr("songId");
+            });
+
+            /* Bind Player *******************************************/
+
+            function bindPlayer() {
+                //// Set button state
+                $(".disabled").removeClass("disabled");
+                switch (playerState) {
+                    case state.paused:
+                        $("#playState").html("(Paused)");
+                        $(".pb-pause").addClass("disabled");
+                        break;
+                    case state.playing:
+                        $("#playState").html("(Playing)");
+                        $(".pb-play").addClass("disabled");
+                        break;
+                    case state.stopped:
+                        $("#playState").html("(Stopped)");
+                        $(".pb-stop").addClass("disabled");
+                        break;
+                }
+
+                //// Set song timeline position slider
+                if (playlist[0] != null && playlist[0].Duration != null && audioPlayer.currentTime != null) {
+                    $("#Timeline").slider({
+                        min: 0,
+                        max: GetSeconds(playlist[0].Duration),
+                        value: 0,
+                        slide: function (event, ui) {
+                            audioPlayer.currentTime = ui.value;
+                        }
+                    });
+                }
+
+                // Bind song info fields
+                var data = playlist[0];
+                if (!data) {
+                    data = { "Title": "", "Artist": "", "Album": "", "DurationString": "" };
+                }
+
+                $.each(data, function (i, item) {
+                    if (item != null) {
+                        $("#" + i).text(item);
+                    }
+                });
+
+                ////// Bind Volume control slider
+                //$("#Volume").slider({
+                //    orientation: "vertical",
+                //    min: 0,
+                //    max: 1,
+                //    value: data.VolumeLevel,
+                //    slide: function (event, ui) {
+                //        console.log(ui.value);
+                //        audioPlayer.volume = ui.value;
+                //    }
+                //});
+
+                resize();
+            }
+
+            /* Bind Playlist *******************************************/
+
+            function bindPlaylist() {
+                //var playlist = $.cookie("playlist");
+                //while (playlist == null || playlist == "") {
+                //    userName = prompt("What's your name?", "");
+                //}
+                //$.cookie("playlist", playlist, { expires: 10 });
+
+
+                $("#PlaylistGrid").empty();
+                if (playlist.length > 1) {
+                    $("#PlaylistGrid").append("<table><thead><tr><th></th><th></th><th>Title</th><th>Artist</th><th>Album</th><th>Duration</th></tr></thead><tbody></tbody></table>");
+                    var playlistTemplate = "<tr><td><a class='k-link unqueueSong' PlaylistIndex='{0}' title='Unqueue Song'><span class='k-icon k-remove'></span></a></td>" +
+                        "<td class='doubleStack'><a class='k-link moveup' PlaylistIndex='{0}' title='Move Up'><span class='k-icon k-i-arrow-n'></span></a>" +
+                        "<a class='k-link movedown' PlaylistIndex='{0}' title='Move Down'><span class='k-icon k-i-arrow-s'></span></a></td>" +
+                        "<td style='white-space:nowrap'>{1}</td>" +
+                        "<td style='white-space:nowrap'>{2}</td>" +
+                        "<td style='white-space:nowrap'>{3}</td>" +
+                        "<td style='white-space:nowrap'>{4}</td></tr>";
+                    $.each(playlist, function (i, e) {
+                        if (i > 0) {
+                            $("#PlaylistGrid table tbody").append(String.format(playlistTemplate, i, e.Title, e.Artist, e.Album, e.Duration, e.SongId));
+                        }
+                    });
+                }
+
+                resize();
+            }
+
+            /* Bind Library *******************************************/
+
+            function bindLibrary(songs) {
+                $("#LibraryGrid").kendoGrid({
+                    dataSource: { data: songs },
+                    height: $(window).outerHeight() - $("#LibraryGrid").position().top - 20, // 20px margin,
+                    sortable: true,
+                    filterable: { extra: false, operators: { string: { startswith: "Starts with", eq: "Is equal to" } } },
+                    //resizable: true,
+                    columns: [{ title: "", width: 22 }, { title: "", width: 22 }, { title: "", width: 22 }, { field: "Title", width: 110 },
+                        { field: "Artist", width: 110 }, { field: "Album", width: 110 }, { field: "Duration", width: 64 }, { field: "Genre", width: 64 }],
+                    rowTemplate: "<tr>" +
+                        "<td><a class='k-link queueSong' songId='${ SongId }' title='Queue Song'><span class='k-icon k-add'></span></a></td>" +
+                        "<td><a class='k-link songDownload' songId='${ SongId }' title='Download Song'><span class='k-icon k-download'></span></a></td>" +
+                        "<td><a class='k-link songPreview' songId='${ SongId }' title='Preview Song'><img src='/Content/Images/silent.gif' /></a></td>" +
+                        "<td>${ Title }</td>" +
+                        "<td>${ Artist }</td>" +
+                        "<td>${ Album }</td>" +
+                        "<td>${ Duration }</td>" +
+                        "<td>${ Genre }</td>" +
+                        "</tr>"
+                });
+
+                resize();
+            }
+
+            audioPreview = null;
+            currentSongId = null;
+
+            /* Preview *******************************************/
+            $(".songPreview").live("click", function () {
+                var previousSongId = currentSongId;
+                currentSongId = $(this).attr("songId");
+
+                // Stop if already played
+                if (previousSongId == currentSongId) {
+                    return stopPreview(previousSongId);
+                }
+
+                // instantiate audioPreview
+                if (audioPreview != null) {
+                    stopPreview(previousSongId);
+                }
+                else {
+                    audioPreview = document.createElement('audio');
+                    //audioPreview.setAttribute('autoplay', 'autoplay');
+                }
+
+                audioPreview.setAttribute('src', "@Url.Action("GetSong")/" + currentSongId);
+                updatePreviewStatus(currentSongId, true);
+
+                $.get();
+                audioPreview.addEventListener("load", function () {
+                    audioPreview.play();
+                }, true);
+                audioPreview.addEventListener("play", function () {
+                    setTimeout("stopPreview('" + currentSongId + "');", 20000);
+                }, true);
+            });
+
+        });
+
+        function stopPreview(songId) {
+            audioPreview.pause();
+            updatePreviewStatus(songId, false);
+        }
+
+        function updatePreviewStatus(songId, isStarting) {
+            if (isStarting) {
+                $(".songPreview[songid=" + songId + "]").find("img").attr("src", "/Content/Images/playing.gif");
+            }
+            else {
+                $(".songPreview[songid=" + songId + "]").find("img").attr("src", "/Content/Images/silent.gif");
+            }
+        }
+
+    </script>
+}
+
+<div style="width: 100%; position: fixed; height: 100%; background-color:#354453">
+    <div id="PlayerDetail" style="margin: 20px; padding: 20px; background-color: #EEEEEE; border: solid #333 1px; height: 165px">
+        <h2 style="margin: 0 0 20px">StandAlone Player <span id="playState"></span>
+        </h2>
+
+        <div id="Player">
+            <div id="Status">
+                <div>
+                    <span id="Title"></span>
+                    <span id="Artist"></span>
+                    <span id="Album"></span>
+                    <span id="DurationString"></span>
+                    <b>
+                        <span id="CurrentPositionString"></span>
+                    </b>
+                </div>
+            </div>
+            <div id="Timeline"></div>
+            <div id="Controls" style="display: table; margin-bottom: 0">
+                <div id="Volume" style="display: table-cell"></div>
+                <a id="btnStop" style="display: table-cell" class="p-button" title="Stop" data-page="21" tabindex="-1"><span class="pb-stop"></span></a>
+                <a id="btnPause" style="display: table-cell" class="p-button" title="Pause" data-page="21" tabindex="-1"><span class="pb-pause"></span></a>
+                <a id="btnPlay" style="display: table-cell" class="p-button" title="Play" data-page="21" tabindex="-1"><span class="pb-play"></span></a>
+                @*<a id="btnFastForward" style="display: table-cell" class="p-button" title="Fast Forward" data-page="21" tabindex="-1"><span class="pb-fastforward"></span></a>*@
+                <a id="btnSkip" style="display: table-cell" class="p-button" title="Skip" data-page="21" tabindex="-1"><span class="pb-skip"></span></a>
+            </div>
+        </div>
+    </div>
+    <div id="PlayerQueue" style="display: table; width: 100%">
+        <div id="LibraryDetail" style="display: table-cell; vertical-align: top; width: 50%">
+            <div style="background-color: #EEEEEE; border: 1px solid #333333; margin: 0 10px 0 20px; overflow: hidden">
+                <div>
+                    <h3 style="padding-left: 10px">Library <a id="lnkRefreshLibrary" title="Get files from library">Refresh</a> <a id="lnkRandom10" title="Picks 10 random songs from (un)filtered library">Queue 10</a></h3>
+                </div>
+                <div id="LibraryGrid">
+                </div>
+            </div>
+        </div>
+        <div id="PlaylistDetail" style="display: table-cell; vertical-align: top; width: 50%">
+            <div style="background-color: #EEEEEE; border: 1px solid #333333; margin: 0 20px 0 10px">
+                <h3 style="padding-left: 10px">Playlist 
+                    <a id="lnkClearPlaylist" title="Clears playlist">Clear</a>
+                    <a id="lnkShufflePlaylist" title="Shuffles playlist">Shuffle</a>
+                </h3>
+                <div id="PlaylistGrid" style="overflow: scroll; width: 200px">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

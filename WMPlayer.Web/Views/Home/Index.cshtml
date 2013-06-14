@@ -1,39 +1,14 @@
 ﻿@{
     ViewBag.Title = "Musiq Server 1000";
 }
-<style>
-    #LibraryGrid table
-    {
-        table-layout: fixed;
-    }
-
-    #LibraryGrid .k-grid-content
-    {
-        overflow: scroll;
-    }
-
-        #LibraryGrid .k-grid-content table td
-        {
-            overflow: hidden;
-        }
-
-    #PlaylistGrid tbody tr:first-child .moveup, #PlaylistGrid tbody tr:last-child .movedown
-    {
-        display: none;
-    }
-
-    .doubleStack .k-link
-    {
-        height: 12px;
-        margin: 0;
-        padding: 0;
-        clear: both;
-    }
-</style>
-
 @section Scripts {
     <script type="text/javascript">
+        // Global Vars
         var popupWinId = '1368813739075';
+        var audioElement = null;
+        var currentSongId = null;
+
+
         String.format = function () {
             var s = arguments[0];
             for (var i = 0; i < arguments.length - 1; i++) {
@@ -70,6 +45,7 @@
             //var h = $(window).outerHeight() - $("#LibraryDetail>div").position().top - 20; // 20px margin
             $("#LibraryDetail>div").height($(window).outerHeight() - $("#LibraryDetail>div").position().top - 20);
             $("#LibraryGrid .k-grid-content").height($(window).outerHeight() - $("#LibraryGrid .k-grid-content").position().top - 20);
+            //$("#LibraryGrid .k-grid-content").css("overflow", "scroll");
 
             $("#PlaylistGrid").height($(window).outerHeight() - $("#PlaylistGrid").position().top - 20);
 
@@ -93,10 +69,6 @@
                 bindLibrary(result);
             };
 
-            playerHub.client.broadcastUserAction = function (result) {
-                bindLibrary(result);
-            };
-
             playerHub.client.broadcastNewMessage = function (name, message) {
                 $("#ActionTicker").prepend(String.format("<li>{0} - {1}</li>", name, message));
             };
@@ -110,7 +82,7 @@
             });
 
             $("#Volume").slider({
-                title: "asdfasdfa",
+                title: "volume",
                 orientation: "vertical",
                 min: 0,
                 max: 100,
@@ -392,6 +364,7 @@
                     audioElement.play();
                 }, true);
                 audioElement.addEventListener("play", function () {
+                    audioElement.currentTime = 30;
                     setTimeout("stopPreview('"+currentSongId+"');", 20000);
                 }, true);
 
@@ -399,8 +372,6 @@
             });
 
         });
-        var audioElement = null;
-        var currentSongId = null;
 
         function stopPreview(songId) {
             audioElement.pause();
@@ -419,10 +390,13 @@
     </script>
 }
 
-<div style="width: 100%; position: fixed; height: 100%;">
-    <div id="PlayerDetail" style="margin: 20px; padding: 20px; background-color: azure; border: solid #333 1px; height: 165px">
-        <h2 style="margin: 0 0 20px">Player <span id="state"></span><span id="playState"></span><a id="popout" title="Popout">
-            <img src="~/Content/Images/icon-popout.png" /></a></h2>
+<div style="width: 100%; position: fixed; height: 100%; background-color:#354453">
+    <div id="PlayerDetail" style="margin: 20px; padding: 20px; background-color: #EEEEEE; border: solid #333 1px; height: 165px">
+        <h2 style="margin: 0 0 20px">Player <span id="state"></span><span id="playState"></span>
+            <a id="popout" title="Popout">
+            <img src="~/Content/Images/icon-popout.png" /></a>
+            <a id="standAlone" title="Launch StandAlone Player" href="@Url.Action("Index", "StandAlone")">StandAlone</a>
+        </h2>
 
         <div id="Player">
             <div id="Status">
@@ -454,7 +428,7 @@
     </div>
     <div id="PlayerQueue" style="display: table; width: 100%">
         <div id="LibraryDetail" style="display: table-cell; vertical-align: top; width: 50%">
-            <div style="background-color: azure; border: 1px solid #333333; margin: 0 10px 0 20px; overflow: hidden">
+            <div style="background-color: #EEEEEE; border: 1px solid #333333; margin: 0 10px 0 20px; overflow: hidden">
                 <div>
                     <h3 style="padding-left: 10px">Library <a id="lnkRefreshLibrary" title="Refetch all files from disk">Refresh</a> <a id="lnkRandom10" title="Picks 10 random songs from (un)filtered library">Queue 10</a></h3>
                 </div>
@@ -463,7 +437,7 @@
             </div>
         </div>
         <div id="PlaylistDetail" style="display: table-cell; vertical-align: top; width: 50%">
-            <div style="background-color: azure; border: 1px solid #333333; margin: 0 20px 0 10px">
+            <div style="background-color: #EEEEEE; border: 1px solid #333333; margin: 0 20px 0 10px">
                 <h3 style="padding-left: 10px">Playlist 
                     <a id="lnkClearPlaylist" title="Clears playlist">Clear</a>
                     <a id="lnkShufflePlaylist" title="Shuffles playlist">Shuffle</a>

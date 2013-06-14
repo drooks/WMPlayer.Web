@@ -87,7 +87,13 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>05/08/2013 18:26:37</publishTime>
     </File>
     <File Include="bin/WMPlayer.Web.dll">
-      <publishTime>05/29/2013 11:14:11</publishTime>
+      <publishTime>06/12/2013 12:20:58</publishTime>
+    </File>
+    <File Include="Content/Images/Background-Footer.png">
+      <publishTime>06/12/2013 12:12:00</publishTime>
+    </File>
+    <File Include="Content/Images/Background-Header.png">
+      <publishTime>06/12/2013 12:11:44</publishTime>
     </File>
     <File Include="Content/Images/Icon-Loading.gif">
       <publishTime>05/10/2013 13:20:04</publishTime>
@@ -120,7 +126,7 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>05/10/2013 14:37:00</publishTime>
     </File>
     <File Include="Content/Site.css">
-      <publishTime>05/16/2013 18:27:52</publishTime>
+      <publishTime>06/03/2013 17:01:52</publishTime>
     </File>
     <File Include="Content/themes/base/images/ui-bg_flat_0_aaaaaa_40x100.png">
       <publishTime>05/10/2013 10:19:33</publishTime>
@@ -354,13 +360,16 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>05/10/2013 10:19:33</publishTime>
     </File>
     <File Include="Views/Home/Index.cshtml">
-      <publishTime>05/31/2013 17:41:44</publishTime>
+      <publishTime>06/14/2013 12:36:58</publishTime>
     </File>
     <File Include="Views/Shared/Error.cshtml">
       <publishTime>05/10/2013 10:19:26</publishTime>
     </File>
     <File Include="Views/Shared/_Layout.cshtml">
       <publishTime>05/20/2013 16:51:19</publishTime>
+    </File>
+    <File Include="Views/StandAlone/Index.cshtml">
+      <publishTime>06/14/2013 12:33:32</publishTime>
     </File>
     <File Include="Views/Web.config">
       <publishTime>05/10/2013 10:19:26</publishTime>
